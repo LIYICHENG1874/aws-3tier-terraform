@@ -11,7 +11,7 @@
 
 ## 2. アーキテクチャ / Architecture
 
-![Architecture](architecture.png)
+![Architecture Diagram](docs/architecture.png)
 
 ### レイヤ構成
 
