@@ -30,8 +30,8 @@
   - ネットワークレベルでの攻撃対象領域を最小化
 
 ---
+
 ## 3. 想定ユースケース / Target Use Case
-## 想定ユースケース / Target Use Case
 
 本構成は以下のような用途を想定しています。
 
@@ -54,62 +54,21 @@
 
 ## 5. IaC 工程化の実装 / Engineering Excellence
 
-単なるリソース構築に留まらず、実務でのメンテナンス性と安全性を意識した設計を取り入れています。
+本プロジェクトでは、Terraform を用いた Infrastructure as Code により、  
+再現性・可読性・保守性を意識した構築を行っています。
 
-- **パラメータ化による柔軟性 (`variables.tf`)** リージョン、CIDR、インスタンスタイプなどを変数化し、環境の再利用性と可読性を向上。
-- **機密情報の保護 (`sensitive` 変数)** DBパスワード等の機密情報は `sensitive = true` として定義。コード内へのハードコーディングを排除し、コンソール出力やログへの露出を防止。
-- **チーム開発の考慮 (Backend 構成)** チームでの状態共有とロックを想定し、S3/DynamoDB を使用した Remote Backend の構成案をコード内にコメントとして記述。
-- **デリバリの効率化 (`outputs.tf`)** 構築完了後、ALB の DNS エンドポイント等を自動出力。手動での確認作業を減らし、後続のタスクへスムーズに連携。
+- 主要な設定値（リージョン、CIDR、インスタンスタイプ等）の変数化
+- 機密情報（DB パスワード）の安全な取り扱い
+- チーム開発を想定した Remote State 構成の考慮
+- Outputs を用いたデプロイ後の確認作業の効率化
 
----
-
-## 6. 設計のポイント / Key Features & Security
-
-本プロジェクトでは、Cloud Engineer（構築）ポジションに求められる  
-**「基礎構成を正しく実装できること」** を重視しました。
-
-### Infrastructure as Code (IaC)
-
-- すべてのリソースを Terraform でコード化
-- data ソースを用いた最新 AMI の動的取得
-- user_data による EC2 初期設定の自動化
-- 環境構築の再現性と変更管理性を確保
-
-### セキュリティ設計（最小権限の原則）
-
-- **Security Group の段階的制御**
-  - ALB → EC2 → RDS のみ通信を許可
-  - 不要なポート・CIDR の開放を排除
-
-- **DB の完全隔離**
-  - DB 用サブネットは NAT Gateway を持たず、外部通信不可
-  - インフラ構成レベルでのデータ保護を実現
-
-### 高可用性（High Availability）
-
-- **Multi-AZ 構成**
-  - ap-northeast-1a / 1c にサブネットを分散
-  - ALB + ASG により AZ 障害時もサービス継続可能な構成
-
-### 設計上の考慮点
-
-- **コストを意識した構成**  
-  本デモでは検証目的のため Auto Scaling Group の desired_capacity を 1 に設定していますが、実運用では容易にスケールアウト可能な構成です。
+設計判断の背景やトレードオフについては、  
+`docs/design-notes.md` にて補足しています。
 
 ---
 
-## 7. 設計判断 / Design Decisions
 
-- **なぜ DB を Isolated Subnet に配置したか**  
-  DB は外部通信を必要としないため、NAT Gateway へのルートを持たないサブネットに配置し、  
-  ネットワークレベルで攻撃対象領域を最小化しました。
-
-- **なぜ Terraform を採用したか**  
-  環境構築の再現性と変更履歴管理を重視し、Infrastructure as Code による構築を行いました。
-
----
-
-## 8. リソース構成 / Resource Components
+## 6. リソース構成 / Resource Components
 
 - **VPC**: 10.0.0.0/16  
 
@@ -126,8 +85,36 @@
   - Multi-AZ 対応可能な構成
 
 ---
+## 7. 実装のポイント / Implementation Highlights
 
-## 9. セットアップ方法 / Usage
+本プロジェクトでは、Cloud Engineer（構築）ポジションに求められる  
+基礎的な構成要素を正しく実装することを重視しています。
+
+### Infrastructure as Code (IaC)
+
+- Terraform によるリソース管理
+- 最新 AMI の動的取得（data source）
+- user_data による EC2 初期設定の自動化
+- 構成変更の再現性と管理性の確保
+
+### セキュリティ設計
+
+- ALB → EC2 → RDS の段階的な通信制御
+- DB サブネットのネットワークレベルでの隔離
+
+### 高可用性
+
+- Multi-AZ 構成（ap-northeast-1a / 1c）
+- ALB + Auto Scaling Group による冗長化構成
+
+### 補足
+
+- 本デモは検証目的のため Auto Scaling Group の desired_capacity を 1 としていますが、  
+  実運用ではスケールアウト可能な構成です。
+---
+
+
+## 8. セットアップ方法 / Usage
 
 ```bash
 # リポジトリのクローン
@@ -144,7 +131,7 @@ terraform apply
 
 ```
 ---
-## 10. スコープについて / Scope
+## 9. スコープについて / Scope
 
 ※ 本プロジェクトは Cloud Engineer（構築）ポジションを想定した基礎構成であり、  
 CI/CD、マルチアカウント管理、運用自動化などの高度な運用設計については、
@@ -152,7 +139,7 @@ CI/CD、マルチアカウント管理、運用自動化などの高度な運用
 
 ---
 
-## 11. 今後の拡張案 / Future Work（Optional）
+## 10. 今後の拡張案 / Future Work（Optional）
 
 - CI/CD パイプライン（GitHub Actions + Terraform）
 - AWS Organizations を用いたマルチアカウント構成
