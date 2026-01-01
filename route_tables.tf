@@ -48,6 +48,7 @@ resource "aws_route_table_association" "private_c" {
 
 #DB Route Table
 resource "aws_route_table" "db" {
+  # Intentionally no default route (no IGW/NAT) to keep DB subnets isolated
   vpc_id = aws_vpc.main.id
 
   tags = {

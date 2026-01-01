@@ -27,7 +27,7 @@ EOF
 
 resource "aws_autoscaling_group" "app_asg" {
   desired_capacity = 1
-  max_size         = 1
+  max_size         = 2
   min_size         = 1
 
   vpc_zone_identifier = [

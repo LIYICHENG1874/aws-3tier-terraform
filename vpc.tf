@@ -4,6 +4,6 @@ resource "aws_vpc" "main" {
   enable_dns_hostnames = true
 
   tags = {
-    Name = "aws-3tier-vpc"
+     Name = var.project_name
   }
 }
