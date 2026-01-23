@@ -1,4 +1,4 @@
-# Design Notes 
+# 設計ノート（Design Notes）
 AWS 3-Tier Architecture via Terraform
 
 ---
@@ -15,7 +15,9 @@ AWS 3-Tier Architecture via Terraform
 - Terraform による **再現性・保守性・可読性** のある IaC 実装
 - 過度な複雑化を避けつつ、**セキュリティ・可用性・拡張性** への配慮を示す
 
-本構成は **中小規模の Web アプリケーションや社内業務システムを想定した構成** です。
+本プロジェクトは **中小規模の Web アプリケーションや社内業務システムを想定した構成** です。  
+また、オンプレミスからのクラウド移行初期フェーズにおいても一般的に採用される構成を意識しています。
+
 
 ---
 
@@ -55,11 +57,9 @@ Private Subnet からのアウトバウンド通信には **NAT Gateway** を使
 - クラウド移行初期の構成として一般的である
 
 ※ 補足  
-本デモでは構成をシンプルに保つため、NAT Gateway は 1 台のみ配置しています。  
+本プロジェクトでは構成をシンプルに保つため、NAT Gateway は 1 台のみ配置しています。  
 本番環境では AZ ごとに NAT Gateway および Route Table を分離し、  
 可用性および AZ 障害耐性を高める構成を想定しています。
-
-
 
 NAT Instance と比較するとコストは高くなりますが、  
 本プロジェクトでは **安定性と標準構成の理解を優先**しました。
@@ -100,16 +100,21 @@ RDS は Isolated Subnet に配置しています。
 ---
 ### 3.3 RDS 運用に関する補足
 
-本デモは検証用途を想定しているため、  
-RDS 削除時の Final Snapshot（`skip_final_snapshot = true`）は省略しています。
+※ 補足
+本プロジェクトでは、全体としては標準構成および安定性への配慮を重視しつつ、
+RDS に関しては検証用途であることからコストおよび構成の簡素化を優先し、
+Single-AZ 構成（Multi-AZ 無効） としています。
+本番環境では可用性要件に応じて Multi-AZ を有効化することを想定しています。
+
+本プロジェクトは検証用途を想定しているため、  
+RDS 削除時の Final Snapshot（`skip_final_snapshot = true`）は省略しています。  
 
 本番環境ではデータ保護の観点から、  
 Final Snapshot を有効化する想定です。
 
-
 ---
 
-## 4. Compute / 可用性設計（Availability）
+## 4. 可用性設計（Availability / Compute）
 
 ### 4.1 ALB + Auto Scaling Group 構成
 
@@ -117,7 +122,7 @@ Final Snapshot を有効化する想定です。
 - EC2 は複数 AZ の Private Subnet に配置
 - ALB Target Group と ASG を連携
 
-本デモでは `desired_capacity = 1` としていますが、  
+本プロジェクトでは `desired_capacity = 1` としていますが、  
 構成上は **スケールアウトおよび AZ 障害耐性を考慮した設計**です。
 
 ---
@@ -133,7 +138,7 @@ Final Snapshot を有効化する想定です。
 
 ---
 
-## 5. Infrastructure as Code の設計判断
+## 5. IaC の設計判断（Infrastructure as Code）
 
 ### 5.1 パラメータ化
 
@@ -155,13 +160,13 @@ Final Snapshot を有効化する想定です。
 S3 + DynamoDB を用いた Remote Backend の例をコメントとして記載しています。
 
 - チーム開発時の state 共有・ロックを理解していることを示すため
-- 本デモでは構成をシンプルに保つため未導入
+- 本プロジェクトでは構成をシンプルに保つため未導入
 
 ---
 
 ## 6. トレードオフ（Trade-offs）
 
-本設計では以下のような判断を行っています。
+本プロジェクトでは以下のような判断を行っています。
 
 - **可読性を優先**
   - Terraform Module への分割は行っていない
@@ -176,14 +181,18 @@ S3 + DynamoDB を用いた Remote Backend の例をコメントとして記載�
 
 ## 7. スコープ外（Out of Scope）
 
-本プロジェクトでは以下は対象外としています。
+本プロジェクトは、Cloud Engineer（構築）としての  
+基礎設計・構築能力を明確に示すことを目的としているため、  
+以下の領域については意図的にスコープ外としています。
 
-- CI/CD パイプライン
-- マルチアカウント構成（Organizations）
-- 監視・アラート・ログ集約
+- CI/CD パイプライン設計
+- マルチアカウント構成（AWS Organizations）
+- 監視・アラート・ログ集約の高度設計
 - マルチリージョン災害対策
 
-これらは将来的な拡張項目と位置付けています。
+これらは将来的な拡張領域として位置付けており、  
+設計・導入に必要な概念や構成については理解しています。
+
 
 ---
 
