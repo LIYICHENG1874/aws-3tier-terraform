@@ -115,6 +115,9 @@ Public / Private / Isolated の境界分離と、Security Group による段階�
 > 事前に AWS 認証情報（AWS CLI / 環境変数など）の設定が必要です。  
 > `db_password` は実行時入力、または `terraform.tfvars` にて指定してください  
 > （機密情報のため Git 管理対象外）。
+>  
+> ※ NAT Gateway / ALB / RDS を作成するため、AWS 利用料金が発生します。  
+> 検証後は `terraform destroy` を実行し、リソース削除を推奨します。
 
 ```bash
 # リポジトリのクローン
