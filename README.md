@@ -166,8 +166,8 @@ ALB / EC2 / RDS の基本構成、および Terraform による IaC 化を中心
 
 ## Related Repository（関連リポジトリ）
 
-本構成上で動作するバックエンドの検証プロジェクトはこちら：
+EC2 / RDS 環境上でバックエンドワークロードの動作検証を行ったプロジェクトはこちらです：
 
-- **Backend Workload Verification (EC2 / RDS 動作検証)**  
+- **Backend Workload Verification（EC2 / RDS 動作検証）**  
   <https://github.com/LIYICHENG1874/ec2-backend-verification>
 
